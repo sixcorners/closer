@@ -1,0 +1,29 @@
+on:
+  push:
+  pull_request:
+jobs:
+  maven:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      issues: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+      - run: |
+          mvn --batch-mode --strict-checksums --threads=2C \
+            -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }} \
+            source:jar javadoc:jar site:3.21.0:jar artifact:buildinfo deploy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: target/*-reports/TEST-*.xml

@@ -1,0 +1,3 @@
+name: info.sixcorners.closer
+exports:
+  - package: info.sixcorners.closer
