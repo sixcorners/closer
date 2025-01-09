@@ -1,0 +1,29 @@
+on:
+  pull_request:
+jobs:
+  maven:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+      - run: mvn --version
+      - run: |
+          mvn $([ "$ACTIONS_RUNNER_DEBUG" = "true" ] && echo --debug) --batch-mode --strict-checksums --threads=2C \
+            -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository }} -DdeployAtEnd \
+            verify site:3.21.0:site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/site/
+      - uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: target/*-reports/TEST-*.xml
