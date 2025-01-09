@@ -31,8 +31,9 @@ jobs:
         with:
           files: target/*-reports/TEST-*.xml
   deploy-site:
-    needs: maven
     runs-on: ubuntu-latest
+    needs: maven
+    if: github.ref_type == 'tag'
     permissions:
       pages: write
       id-token: write
