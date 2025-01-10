@@ -1,7 +1,7 @@
 on:
   pull_request:
 jobs:
-  maven:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
